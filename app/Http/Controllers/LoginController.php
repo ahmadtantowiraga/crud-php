@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Str;
+use Auth;
 
 class LoginController extends Controller
 {
@@ -10,12 +13,21 @@ class LoginController extends Controller
         return view('login');
     }
     public function loginuser(Request $request){
-        return redirect('/penduduk');
+        if(Auth::attempt($request->only('email','password'))){
+            return redirect('/penduduk');
+        }
+        return redirect('/login');
     }
     public function register(){
         return view('register');
     }
     public function registeruser(Request $request){
-        return redirect('login');
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'remember_token' => Str::random(60),
+        ]);
+        return redirect('/login');
     }
 }
